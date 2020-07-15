@@ -20,22 +20,20 @@
 const bodyElement = document.querySelector('body');
 const allSections = document.getElementsByTagName('section');
 const navBarList = document.getElementById('navbar__list');
-
+let timer;
 let activeSection = 'section1';
 let isScrolling;
-let nearTop = [];
 
 /**
  * End Global Variables
  * Start Helper Functions
  * 
 */
-let isInViewPort = function (element) {
-    let sectionNum = element.getAttribute('id').slice(-1);
-    const rect = element.getBoundingClientRect();
-    nearTop[sectionNum - 1] = Math.abs(rect.top);
+let scrollToSection = function(ev){
+    event.preventDefault();
+    const section = document.querySelector(`#${ev.target.innerHTML}`);
+    section.scrollIntoView({behavior : 'smooth'});
 }
-
 
 /**
  * End Helper Functions
@@ -47,13 +45,9 @@ let isInViewPort = function (element) {
 let buildNavigationMenu = function () {
     const virtualDom = document.createDocumentFragment();
     for (const section of allSections) {
+        const sectionId = section.getAttribute('id');
         const liNavBar = document.createElement('li');
-        if (section.getAttribute('class') == 'active') {
-            liNavBar.innerHTML = `<a href= #${section.getAttribute('id')} class= 'active'>${section.getAttribute('id')}</a>`;
-        } else {
-            liNavBar.innerHTML = `<a href= #${section.getAttribute('id')}>${section.getAttribute('id')}</a>`;
-        }
-
+        liNavBar.innerHTML = `<a href= #${sectionId}>${sectionId}</a>`;
         virtualDom.appendChild(liNavBar);
     }
     navBarList.appendChild(virtualDom);
@@ -62,18 +56,30 @@ let buildNavigationMenu = function () {
 
 
 // Add class 'active' to section when near top of viewport
-let checkSectionInView = function () {
+let inViewPort = function () {
+    let nearTop = [];
+    let rect, i;
+    i = 0;
+    
+    // Calaculte top boundry value for each section 
     for (const section of allSections) {
-        isInViewPort(section);
-        section.removeAttribute('class');
-        document.querySelector(`a[href='#${section.getAttribute('id')}']`).removeAttribute('class');
+        rect = section.getBoundingClientRect();
+        nearTop[i] = Math.abs(rect.top);
+        i += 1;
     }
-    let inViewSectionNum = nearTop.indexOf(Math.min(...nearTop)) + 1;
-    let inViewSectionElement = document.querySelector(`#section${inViewSectionNum}`);
-    inViewSectionElement.setAttribute('class', 'active');
-    document.querySelector(`a[href='#section${inViewSectionNum}']`).setAttribute('class','active');
-}
+   
+    // Delete Class Attribute from the old section
+    if(document.querySelector('section.active') != null && document.querySelector('a.active') != null){
+        document.querySelector('section.active').removeAttribute('class');
+        document.querySelector('a.active').removeAttribute('class');
+    }
 
+    // Add Class Attribute to the class near to the top
+    let inViewSectionNum = nearTop.indexOf(Math.min(...nearTop));
+    let inViewSectionElement = document.querySelectorAll('section')[inViewSectionNum];
+    inViewSectionElement.setAttribute('class', 'active');
+    document.querySelector(`a[href='#${inViewSectionElement.getAttribute('id')}']`).setAttribute('class', 'active');
+}
 // Scroll to anchor ID using scrollTO event
 
 
@@ -85,10 +91,9 @@ let checkSectionInView = function () {
 
 // Build menu 
 document.addEventListener('DOMContentLoaded', buildNavigationMenu);
+
 // Scroll to section on link click
-navBarList.addEventListener('click',checkSectionInView);
+navBarList.addEventListener('click',scrollToSection);
+
 // Set sections as active
-
-window.addEventListener('scroll',checkSectionInView);
-
-
+document.addEventListener('scroll', inViewPort);

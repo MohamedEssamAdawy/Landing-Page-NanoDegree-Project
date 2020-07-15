@@ -39,6 +39,9 @@ h2 {
     font-size: 3em;
     color: #fff;
 }
+section.active div h2{
+    color: #cc1;
+}
 
 p {
     line-height: 1.6em;
@@ -86,7 +89,7 @@ section {
     text-transform: capitalize;
     text-decoration: none;
 }
-a.active, a:hover {
+a.active {
     background: #cc1;
     transition: .5s;
 }
