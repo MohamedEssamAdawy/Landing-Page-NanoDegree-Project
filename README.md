@@ -25,3 +25,7 @@ In this project, a dynamic navigation bar is required corresponding to sections 
 1. The navigation bar is hidden if no scrolling.
 2. The navigation bar appears if the mouse pointer moves on it and disappears if move out from it.
 3. Back to the top of the page button is added stylized with an image.
+
+## Author
+
+- **Mohammed Essam** - [MElborolossy](https://github.com/MElborolossy)
