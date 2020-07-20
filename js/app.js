@@ -22,6 +22,7 @@ const allSections = document.getElementsByTagName('section');
 const navBarList = document.getElementById('navbar__list');
 const headerElement = document.querySelector('.page__header');
 const topButton = document.querySelector('#backTop');
+let perviousScroll = 0;
 let isScrollingStopped;
 
 /**
@@ -32,11 +33,11 @@ let isScrollingStopped;
 
 /* hideHeader helper function to hide the navigation bar */
 let hideHeader = function () {
-    headerElement.style.opacity = '0';
+    headerElement.style.visibility = 'hidden';
 }
 
 /* showBackTopButton helper function to detect if page not on the top */
-let showBackTopButton = function() {
+let showBackTopButton = function () {
     if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
         topButton.style.display = "block";
     } else {
@@ -45,10 +46,9 @@ let showBackTopButton = function() {
 }
 
 /* goToTop is the onclick function for the backTop button */
-let goToTop = function() {
-    document.body.scrollTop = 0; // For Safari
-    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-  }
+let goToTop = function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
 /**
  * End Helper Functions
@@ -74,7 +74,7 @@ let inViewPort = function () {
     let rect, i;
     i = 0;
 
-    /* Calaculte top boundry value for each section */ 
+    /* Calaculte top boundry value for each section */
     for (const section of allSections) {
         rect = section.getBoundingClientRect();
         nearTop[i] = Math.abs(rect.top);
@@ -83,8 +83,8 @@ let inViewPort = function () {
 
     /* Delete Class Attribute from the old section */
     if (document.querySelector('section.active') != null && document.querySelector('a.active') != null) {
-        document.querySelector('section.active').removeAttribute('class');
-        document.querySelector('a.active').removeAttribute('class');
+        document.querySelector('section.active').classList.remove('active');
+        document.querySelector('a.active').classList.remove('active');
     }
 
     /* Add Class Attribute to the class near to the top */
@@ -96,7 +96,7 @@ let inViewPort = function () {
 
 /* Scroll to anchor ID using scrollTO event */
 let scrollToSection = function (ev) {
-    event.preventDefault();
+    ev.preventDefault();
     const section = document.querySelector(`#${ev.target.innerHTML}`);
     section.scrollIntoView({ behavior: 'smooth' });
 }
@@ -118,15 +118,12 @@ document.addEventListener('scroll', function () {
     clearTimeout(isScrollingStopped);
     inViewPort();
     showBackTopButton();
-    headerElement.style.opacity = '1';
-    isScrollingStopped = setTimeout(hideHeader, 100);
+    // Detect Scroll Down;
+    let currnetScroll = window.pageYOffset || document.documentElement.scrollTop;
+    if (currnetScroll > perviousScroll) {
+        isScrollingStopped = setTimeout(hideHeader, 100);
+    } else {
+        headerElement.style.visibility = 'visible';
+    }
+    perviousScroll = currnetScroll <= 0 ? 0 : currnetScroll;
 });
-
-/* Show navigation bar if mouseover it */
-headerElement.addEventListener('mouseover', function () {
-    clearTimeout(isScrollingStopped);
-    headerElement.style.opacity = '1';
-});
-
-/* hide navigation bar after mouse move out from it */
-headerElement.addEventListener('mouseout', hideHeader);
